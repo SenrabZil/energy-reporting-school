@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 13 — Controls: accepted is not correct · Energy Reporting School</title>
+<style>
+  :root{
+    --frost:#EEF3F7; --panel:#FFFFFF; --ink:#13202E; --slate:#5A6A7A;
+    --line:#D3DDE6; --deep:#0E1F33; --deep-2:#16314E; --volt:#10B5C9; --volt-ink:#0A7E8E;
+    --ember:#E0913A; --ember-ink:#B16A12; --warm:#C2603F; --ok:#2FA980; --bad:#DD6457;
+    --mono: ui-monospace,"SF Mono","Cascadia Code",Consolas,"Roboto Mono",monospace;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--frost);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:20;background:rgba(238,243,247,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+  .bar{display:flex;justify-content:space-between;align-items:center;height:52px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;gap:12px}
+  .bar b{font-weight:700} .bar b a{color:inherit;text-decoration:none} .bar .r{font-family:var(--mono);color:var(--slate);display:flex;align-items:center;gap:14px}
+  .gbtn{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:1px solid var(--volt);color:var(--volt-ink);border-radius:8px;padding:5px 10px;cursor:pointer}
+  @media(max-width:520px){.bar .lt{display:none}}
+  .gbtn:hover{background:var(--volt);color:#04222a}
+  .hero{padding:60px 0 26px}
+  .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--volt-ink);margin-bottom:16px}
+  h1{font-size:clamp(32px,5.6vw,54px);line-height:1.03;letter-spacing:-.02em;margin:0 0 16px;font-weight:780}
+  .lead{font-size:clamp(18px,2.4vw,22px);color:var(--slate);max-width:42ch;margin:0}
+  .byline{margin-top:20px;font-size:14px;color:var(--slate)} .byline b{color:var(--ink)}
+  section{padding:36px 0;border-top:1px solid var(--line)}
+  .snum{font-family:var(--mono);font-size:13px;color:var(--volt-ink);letter-spacing:.1em}
+  h2{font-size:clamp(23px,3.3vw,32px);line-height:1.12;letter-spacing:-.015em;margin:6px 0 12px;font-weight:740}
+  p{margin:0 0 16px} .muted{color:var(--slate)}
+  .say{border-left:2px solid var(--volt);padding:2px 0 2px 18px;margin:18px 0}
+  .caution{border-left:2px solid var(--ember);padding:2px 0 2px 18px;margin:18px 0;color:var(--ember-ink);font-size:15px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:20px 0}
+  .stage{position:relative;border-radius:12px;overflow:hidden}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .stage svg{display:block}
+  @media(max-width:620px){.stage svg.wide{min-width:600px}}
+  .cover{position:absolute;inset:0;background:linear-gradient(180deg,var(--deep),#0a1726);color:#cfe;display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity .5s;z-index:4}
+  .cover.gone{opacity:0;pointer-events:none} .cover .q{font-size:16px;max-width:34ch;color:#dCEbF0}
+  .controls{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin-top:14px}
+  .cl{font-family:var(--mono);font-size:12px;color:var(--slate)}
+  .grp{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
+  .seg button{font-family:var(--mono);font-size:13px;border:0;background:#fff;color:var(--slate);padding:8px 14px;cursor:pointer}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button[aria-pressed=true]{background:var(--volt);color:#04222a}
+  .seg button:disabled{opacity:.4;cursor:default}
+  .ctl{display:flex;flex-direction:column;gap:6px;min-width:240px;flex:1}
+  .ctl label{font-family:var(--mono);font-size:12.5px;color:var(--slate);display:flex;justify-content:space-between} .ctl label b{color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--volt)}
+  .readout{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;margin-top:14px;border-top:1px dashed var(--line);padding-top:14px;font-family:var(--mono);font-size:13.5px;color:var(--slate)}
+  .readout b{color:var(--ink)} .readout .big{font-size:22px;font-weight:600;color:var(--ink)}
+  .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:5px 11px;background:#eef3f7;color:var(--slate)}
+  .tag.ok{background:#e3f6ee;color:#1c7a59} .tag.bad{background:#fbeae7;color:#b23a2c} .tag.warn{background:#fcf0e1;color:#9a5a0c} .tag.on{background:#e3f7fa;color:var(--volt-ink)}
+  .list{margin:12px 0 0;padding:0;list-style:none;font-family:var(--mono);font-size:13px;display:flex;flex-direction:column;gap:6px}
+  .list li{padding-left:20px;position:relative;color:var(--ink)} .list li::before{content:"";position:absolute;left:2px;top:.55em;width:9px;height:9px;border-radius:50%;background:var(--volt)}
+  .list li.via::before{background:transparent;border:2px dashed var(--volt-ink);width:7px;height:7px}
+  .list li.warn::before{background:var(--ember)} .list li.bad::before{background:var(--bad)} .list li .m{color:var(--slate)}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--slate)}
+  .legend span{display:inline-flex;align-items:center;gap:6px} .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .choices{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+  .choice{font-family:var(--mono);font-size:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 16px;cursor:pointer;color:var(--ink);transition:.15s;text-align:left}
+  .choice:hover{border-color:var(--volt)} .choice[aria-pressed=true]{background:var(--deep);color:#fff;border-color:var(--deep)}
+  .choice:disabled{opacity:.55;cursor:default}
+  .verdict{font-size:15px;margin-top:4px;min-height:1.4em} .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .pill{font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px}
+  .pill b{color:var(--volt-ink);margin-right:6px}
+  table.t{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+  table.t th{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);text-align:left;font-weight:500;padding:8px 10px;border-bottom:1px solid var(--line)}
+  table.t td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top} table.t tr:last-child td{border-bottom:0}
+  .rule{background:var(--deep);color:#eaf6f8;border-radius:14px;padding:24px;margin-top:8px}
+  .rule h3{margin:0 0 10px;font-size:20px;color:#fff} .rule p{color:#bcd6dc;margin:0 0 10px} .rule p:last-child{margin:0} .rule .k{color:var(--volt);font-family:var(--mono)}
+  .rule a.gt{color:#eaf6f8}
+  nav.lessonseq{max-width:860px;margin:0 auto;padding:30px 24px 0;display:flex;justify-content:space-between;gap:16px;font-family:var(--mono);font-size:13px;border-top:1px solid var(--line)}
+  nav.lessonseq a{color:var(--volt-ink);text-decoration:none;max-width:48%} nav.lessonseq a:last-child{text-align:right}
+  footer{padding:48px 0;color:var(--slate);font-size:13px;border-top:1px solid var(--line)}
+  :focus-visible{outline:2px solid var(--volt);outline-offset:2px}
+  .reflist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:15px}
+  .reflist li{padding-left:18px;position:relative} .reflist li::before{content:"\2197";position:absolute;left:0;color:var(--volt-ink);font-size:13px}
+  .reflist a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px} .reflist a:hover{text-decoration-color:var(--volt)}
+  .reflist .src{font-family:var(--mono);font-size:11.5px;color:var(--slate);margin-left:6px}
+  /* glossary */
+  a.gt{color:inherit;text-decoration:underline dotted;text-decoration-color:var(--volt-ink);text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
+  a.gt:hover{color:var(--volt-ink)}
+  dialog.gd{border:0;border-radius:14px;padding:0;width:min(540px,calc(100vw - 28px));max-height:min(80vh,680px);background:var(--deep);color:#eaf6f8;box-shadow:0 24px 60px rgba(10,23,38,.45)}
+  dialog.gd::backdrop{background:rgba(14,31,51,.5);backdrop-filter:blur(2px)}
+  .gd .in{padding:22px 24px 24px;max-height:min(80vh,680px);overflow-y:auto}
+  .gd .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .gd .ey{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--volt)}
+  .gd .x{background:none;border:0;color:#9fc0cb;font-size:20px;cursor:pointer;padding:2px 6px}
+  .gd h3{margin:0 0 4px;font-size:24px;color:#fff;letter-spacing:-.01em}
+  .gd .exp{font-family:var(--mono);font-size:13px;color:#9fc0cb;margin:0 0 12px}
+  .gd p{color:#cfe3e8;margin:0 0 12px;font-size:16px}
+  .gd a{color:var(--volt)} .gd a.gt{color:#eaf6f8;text-decoration-color:var(--volt)}
+  .gd .deep{font-family:var(--mono);font-size:13px}
+  .gd .all{font-family:var(--mono);font-size:13px;background:transparent;border:1px solid var(--volt);color:var(--volt);border-radius:10px;padding:8px 14px;cursor:pointer;margin-top:6px}
+  .gd input{width:100%;font-family:var(--mono);font-size:14px;background:#0a1726;border:1px solid #2a4560;color:#eaf6f8;border-radius:10px;padding:10px 12px;margin:4px 0 12px}
+  .gd dl{margin:0} .gd dt{margin-top:12px;font-weight:650} .gd dt a{color:#fff;text-decoration:underline dotted var(--volt);text-underline-offset:3px}
+  .gd dd{margin:3px 0 0;color:#bcd6dc;font-size:14.5px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+
+  .book{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px;margin-top:14px}
+  .book th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);text-align:left;font-weight:500;padding:6px 8px;border-bottom:1px solid var(--line)}
+  .book td{padding:7px 8px;border-bottom:1px solid var(--line)} .book tr:last-child td{border-bottom:0}
+  .book td.x{color:var(--bad);font-weight:600} .book td.w{color:var(--ember-ink);font-weight:600}
+  .seg.multi button[aria-pressed=true]{background:var(--deep);color:#fff}</style>
+</head>
+<body>
+<header><div class="wrap bar"><b><a href="index.html">Energy Reporting School</a></b><span class="r"><span class="lt">Lesson 13 &middot; Controls</span><button class="gbtn" data-gall>Glossary</button></span></div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Lesson 13 &middot; Controls</div>
+    <h1>Accepted<br>is not correct.</h1>
+    <p class="lead">Every regime asks for data that is accurate, complete and on time. A green acknowledgement proves the file arrived. Only a reconciliation proves it was right.</p>
+    <p class="byline">with <b>Elizabeth Cecilia</b>. Three records, three comparisons, and the trade nobody sent.</p>
+  </div>
+
+  <section>
+    <div class="snum">01</div>
+    <h2>Three records of the same trade</h2>
+    <p>Every reported trade exists three times. In the <b>trading book</b> &mdash; usually the ETRM, the golden source. In the <b>submission</b> your reporting engine or provider sent. And in the <b>accepted record</b> the RRM, trade repository or authority actually holds. Controls are comparisons between the three.</p>
+    <table class="t"><tr><th>Check</th><th>Compares</th><th>Asks</th></tr>
+      <tr><td>Population</td><td>book and submission</td><td>Did every reportable event go out?</td></tr>
+      <tr><td>Economics and identifiers</td><td>book and submission</td><td>Do price, volume, dates, LEI and UTI match the source?</td></tr>
+      <tr><td>Acknowledgement</td><td>submission and accepted record</td><td>Was each record accepted, and every rejection repaired?</td></tr>
+      <tr><td>End to end</td><td>book and accepted record</td><td>Does what the regulator holds match the book, including amendments?</td></tr></table>
+  </section>
+
+  <section>
+    <div class="snum">02</div>
+    <h2>Break the book</h2>
+    <p class="say"><b>Predict first:</b> your reporting provider shows 100% of submissions accepted. One trade was never sent at all. Which check finds it?</p>
+    <div class="choices" id="pq" role="group" aria-label="Which check finds an unsent trade">
+      <button class="choice" data-v="ack">Acknowledgement</button>
+      <button class="choice" data-v="pop">Population</button>
+      <button class="choice" data-v="none">None: if it&rsquo;s 100% accepted, it&rsquo;s fine</button>
+    </div>
+    <div class="verdict"></div>
+    <div class="panel">
+      <div class="stage scroll">
+        <svg viewBox="0 0 720 280" width="100%" class="wide" id="cSvg" role="img" aria-label="Three-way reconciliation between book, submission and accepted record"></svg>
+        <div class="cover" id="cv"><div class="q">Predict above, then inject defects into the book.</div></div>
+      </div>
+      <div class="controls"><div class="grp"><span class="cl">inject</span><div class="seg multi" id="df">
+        <button data-v="d1" aria-pressed="true">T4 never sent</button><button data-v="d2" aria-pressed="false">T2 volume mapped wrong</button><button data-v="d3" aria-pressed="false">T5 rejected, LEI lapsed</button><button data-v="d4" aria-pressed="false">T5 repaired</button></div></div></div>
+      <div class="scroll"><table class="book" id="bk"></table></div>
+      <div class="readout"><span><span class="muted">provider dashboard</span> <span class="big" id="dash"></span></span><span><span class="muted">breaks your checks find</span> <span class="big" id="brk"></span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="snum">03</div>
+    <h2>What each defect teaches</h2>
+    <p>The unsent trade is the dangerous one. The provider only knows about what it received, so its dashboard stays at 100%. Only the <b>population</b> check, which starts from the book, can see a trade that never left. The wrong volume is accepted too &mdash; the field is valid, just wrong &mdash; and only <b>economics</b> catches it. The lapsed LEI is the one the receiver tells you about, and the <b>acknowledgement</b> check makes sure someone repairs it.</p>
+    <p>When a check finds a break, the workflow is the same every time: <b>detect</b>, <b>triage</b> by the layer that caused it (source data, mapping, reporting logic, timing, or something external), <b>repair</b> at that layer and resubmit, and keep the <b>evidence</b> of each step.</p>
+  </section>
+
+  <section>
+    <div class="snum">04</div>
+    <h2>Design around obligations, not files</h2>
+    <p>File formats and channels change &mdash; EMIR Refit rewrote the schema in 2024, and the REMIT recast is rewriting it again. Controls anchored to obligations and business events survive those changes. Controls anchored to files have to be rebuilt each time. And a manual patch to a reported record fixes one row while breaking the line back to the source.</p>
+    <p class="caution">This describes a control pattern, not a firm&rsquo;s required controls. What a supervisor expects from a given firm depends on its regimes and its risks.</p>
+  </section>
+
+  <section>
+    <div class="snum">05</div>
+    <h2>The rule, in one breath</h2>
+    <div class="rule">
+      <h3>Accepted is not correct: reconcile the book to the submission to the accepted record, and keep the evidence.</h3>
+      <p><span class="k">Population</span> finds what never left. <span class="k">Economics</span> finds what left wrong. <span class="k">Acknowledgement</span> finds what was refused. End to end finds whatever is left.</p>
+      <p class="muted" style="color:#9fc0cb">Next: the checkpoint. One reporting day, every regime, read end to end.</p>
+    </div>
+  </section>
+  <section>
+    <div class="snum">Sources</div>
+    <h2>References</h2>
+    <ul class="reflist"><li><a href="https://acer.europa.eu/remit/data-collection/data-reporting" target="_blank" rel="noopener">ACER, REMIT data reporting</a><span class="src">ACER</span></li><li><a href="https://www.acer.europa.eu/remit-documents/remit-reporting-guidance" target="_blank" rel="noopener">ACER, REMIT reporting guidance</a><span class="src">ACER</span></li><li><a href="https://www.esma.europa.eu/publications-and-data/interactive-single-rulebook/emir/article-9-reporting-obligation-0" target="_blank" rel="noopener">ESMA Interactive Single Rulebook, EMIR Article 9</a><span class="src">ESMA and ESAs</span></li></ul>
+    <p class="muted" style="margin-top:14px;font-size:15px">Every source used across the series is on the <a href="references.html" style="color:var(--volt-ink)">references page</a>.</p>
+  </section>
+<nav class="lessonseq"><a href="12_internal_reporting.html">&larr; Builds on &middot; Internal reporting: P&amp;L and settlement</a><a href="14_capstone.html">Next &middot; The reporting day &rarr;</a></nav>
+  <footer class="wrap">Energy Reporting School &middot; Lesson 13 — education only. Not legal advice; no reporting decisions made here.</footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const C={volt:"#10B5C9",voltInk:"#0A7E8E",ink:"#13202E",slate:"#5A6A7A",line:"#D3DDE6",ember:"#E0913A",emberInk:"#B16A12",bad:"#DD6457",ok:"#2FA980",deep:"#0E1F33",warm:"#C2603F",frost:"#EEF3F7"};
+  const MONO='font-family="ui-monospace,SF Mono,Consolas,monospace"', SANS='font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif"';
+  const ST={"":["#fff",C.line,1.2],on:["#E3F7FA",C.volt,2.2],via:["#fff",C.voltInk,1.8],ok:["#E3F6EE",C.ok,2.2],bad:["#FBEAE7",C.bad,2.2],warn:["#FCF0E1",C.ember,2.2],dim:["#fff",C.line,1.2],deep:[C.deep,C.deep,1]};
+  function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+  function bx(x,y,w,h,t,s,st){st=st||"";const p=ST[st];const tc=st==="deep"?"#fff":C.ink, sc=st==="deep"?"#9fc0cb":C.slate;
+    const ty=s?y+h/2-3:y+h/2+5;
+    return '<g opacity="'+(st==="dim"?0.38:1)+'"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" fill="'+p[0]+'" stroke="'+p[1]+'" stroke-width="'+p[2]+'"'+(st==="via"?' stroke-dasharray="6 4"':'')+'/>'+
+      '<text x="'+(x+w/2)+'" y="'+ty+'" text-anchor="middle" '+SANS+' font-size="15.5" font-weight="650" fill="'+tc+'">'+esc(t)+'</text>'+
+      (s?'<text x="'+(x+w/2)+'" y="'+(ty+19)+'" text-anchor="middle" '+MONO+' font-size="12" fill="'+sc+'">'+esc(s)+'</text>':'')+'</g>';}
+  function ln(x1,y1,x2,y2,col,w,dash,head){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+col+'" stroke-width="'+(w||1.6)+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+(head?' marker-end="url(#'+head+')"':'')+'/>';}
+  function tx(x,y,s,o){o=o||{};return '<text x="'+x+'" y="'+y+'" text-anchor="'+(o.a||"start")+'" '+(o.sans?SANS:MONO)+' font-size="'+(o.fs||11)+'" font-weight="'+(o.fw||400)+'" fill="'+(o.c||C.slate)+'">'+esc(s)+'</text>';}
+  function heads(){return '<defs>'+[["hv",C.volt],["hs",C.slate],["hl",C.line],["he",C.ember],["hb",C.bad],["hk",C.ok]].map(function(a){return '<marker id="'+a[0]+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="'+a[1]+'"/></marker>'}).join("")+'</defs>';}
+  function seg(groupSel,cb){const bs=$$(groupSel+" button");bs.forEach(b=>b.addEventListener("click",()=>{bs.forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");cb(b.dataset.v);}));}
+  function predict(sel,right,okText,badText,onDone){$(sel).addEventListener("click",e=>{const b=e.target.closest(".choice");if(!b)return;
+    $$(sel+" .choice").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");
+    const v=$(sel+"+.verdict");if(b.dataset.v===right){v.className="verdict ok";v.textContent=okText;}else{v.className="verdict bad";v.textContent=badText;}
+    if(onDone)onDone(b.dataset.v);});}
+
+
+  const T=[["T1",25],["T2",25],["T3",10],["T4",40],["T5",15],["T6",30]];let D={d1:true,d2:false,d3:false,d4:false};
+  $$("#df button").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.v;D[k]=!D[k];b.setAttribute("aria-pressed",D[k]);draw();}));
+  function draw(){const rows=T.map(([id,v])=>{let sent=v,acc=v;
+      if(id==="T4"&&D.d1){sent=null;acc=null;}
+      if(id==="T2"&&D.d2){sent=50;acc=50;}
+      if(id==="T5"&&D.d3){acc=D.d4?v:"rejected";}
+      return {id,v,sent,acc};});
+    const pop=rows.filter(r=>r.sent===null).length, eco=rows.filter(r=>r.sent!==null&&r.sent!==r.v).length,
+      ack=rows.filter(r=>r.acc==="rejected").length, e2e=rows.filter(r=>r.acc!==r.v).length;
+    const sentN=rows.filter(r=>r.sent!==null).length, accN=rows.filter(r=>r.sent!==null&&r.acc!=="rejected").length;
+    $("#bk").innerHTML='<tr><th>Trade</th><th>Book</th><th>Submission</th><th>Accepted record</th></tr>'+rows.map(r=>'<tr><td>'+r.id+'</td><td>'+r.v+' MW</td><td class="'+(r.sent===null?"x":r.sent!==r.v?"x":"")+'">'+(r.sent===null?"never sent":r.sent+" MW")+'</td><td class="'+(r.acc===null?"x":r.acc==="rejected"?"w":r.acc!==r.v?"x":"")+'">'+(r.acc===null?"&mdash;":r.acc==="rejected"?"rejected":r.acc+" MW"+(r.id==="T5"&&D.d3&&D.d4?" (resent)":""))+'</td></tr>').join("");
+    let s=heads();const edge=(x1,y1,x2,y2,n,l1,l2,lx,ly,a)=>{const c=n?C.bad:C.ok;return ln(x1,y1,x2,y2,c,n?3:2.2,"")+tx(lx,ly,l1,{a:a,sans:1,fs:13.5,fw:650,c:c})+tx(lx,ly+17,n?(n+" break"+(n>1?"s":"")):"clean",{a:a,fs:11.5,c:c})+(l2?tx(lx,ly+34,l2,{a:a,fs:11}):"");};
+    s+=edge(318,74,150,200,pop+eco,"Population, economics","book and submission",200,118,"end");
+    s+=edge(240,232,480,232,ack,"Acknowledgement","",360,256,"middle");
+    s+=edge(402,74,570,200,e2e,"End to end","book and accepted",520,118,"start");
+    s+=bx(280,16,160,58,"Trading book","the golden source","deep");
+    s+=bx(40,202,200,58,"Submission","what you sent","");
+    s+=bx(480,202,200,58,"Accepted record","what they hold","");
+    $("#cSvg").innerHTML=s;
+    const pct=sentN?Math.round(100*accN/sentN):0;$("#dash").textContent=pct+"% accepted";
+    $("#brk").textContent=(pop+eco+ack)+"";}
+  draw();
+  predict("#pq","pop","Right. The provider only sees what it received, so it reports 100%. The population check starts from the book and finds the gap.","Only the population check, which starts from the book, can see a trade that never left. The provider's 100% is 100% of what arrived.",()=>$("#cv").classList.add("gone"));
+
+var G=[{"k":"acer","t":"ACER","x":"EU Agency for the Cooperation of Energy Regulators","d":"Collects REMIT data, runs EU-wide market surveillance, issues REMIT guidance, and authorises RRMs and IIPs. Since the 2024 revision it can also investigate cross-border cases with the NRAs.","u":"remit","cs":1},{"k":"acercode","t":"ACER code","d":"The identifier a market participant receives when it registers with its NRA. It appears in REMIT reports.","u":"remit","a":["ACER codes"]},{"k":"acm","t":"ACM","x":"Autoriteit Consument & Markt","d":"The Netherlands Authority for Consumers and Markets. The Dutch NRA for REMIT.","u":"framework","cs":1},{"k":"afm","t":"AFM","x":"Autoriteit Financiële Markten","d":"The Dutch Authority for the Financial Markets. Receives MiFIR transaction reports and supervises EMIR and DORA for the firms in its remit.","u":"framework","cs":1},{"k":"ack","t":"Acknowledgement","d":"The receiver’s accept or reject response to a submission. Accepted means the file passed validation, not that the content is right.","u":"controls","a":["acknowledgement","acknowledgements","Acknowledgements"]},{"k":"action","t":"Action type","d":"The EMIR field that tells the trade repository what a report does: NEWT (new), MODI (modify), CORR (correct), TERM (terminate), EROR (error) and others.","u":"emir","a":["action type","action types","Action types"]},{"k":"aae","t":"Ancillary activity exemption","d":"The MiFID II exemption for firms whose commodity derivative trading is ancillary to their main business. Many energy traders use it, which keeps them outside MiFIR transaction reporting and DORA.","u":"mifir","a":["ancillary activity exemption"]},{"k":"aris","t":"ARIS","x":"ACER REMIT Information System","d":"ACER’s system for collecting and analysing REMIT data.","u":"remit","cs":1},{"k":"arm","t":"ARM","x":"Approved Reporting Mechanism","d":"A firm authorised to send MiFIR transaction reports on behalf of investment firms. Most are supervised directly by ESMA.","u":"mifir","cs":1,"a":["ARMs"]},{"k":"bz","t":"Bidding zone","d":"The largest area within which electricity can be traded without capacity allocation. Transparency data is often published per bidding zone.","u":"transparency","a":["bidding zone","bidding zones"]},{"k":"break","t":"Break","d":"A difference between source data and reported data, or a rejection, that needs triage and repair.","u":"controls","nolink":1},{"k":"commission","t":"European Commission","d":"Proposes Level 1 EU law and adopts Level 2 delegated and implementing acts.","u":"framework","a":["the Commission"]},{"k":"nca","t":"Competent authority","x":"national competent authority (NCA)","d":"The national financial supervisor. Receives MiFIR transaction reports and DORA incident reports and enforces EMIR, MiFIR and DORA. In the Netherlands, the AFM and DNB.","u":"framework","a":["competent authority","competent authorities","national competent authority","NCA","NCAs"]},{"k":"delegated","t":"Delegated act","d":"A Level 2 act adopted by the Commission to supplement Level 1 law. Most RTS are adopted as delegated regulations.","u":"framework","a":["delegated act","delegated acts","Delegated Regulation","delegated regulation"]},{"k":"directive","t":"Directive","d":"An EU law that each member state must write into its own law before it applies. MiFID II is a directive.","u":"framework","a":["directive","directives"]},{"k":"dnb","t":"DNB","x":"De Nederlandsche Bank","d":"The Dutch central bank and prudential supervisor. Shares EMIR and DORA supervision with the AFM.","u":"framework","cs":1},{"k":"dora","t":"DORA","x":"Digital Operational Resilience Act, Regulation 2022/2554","d":"EU regulation on ICT risk at financial entities, applying from 17 January 2025. Requires major ICT incidents to be reported to the competent authority.","u":"dora","cs":1},{"k":"double","t":"Double reporting","d":"Reporting the same trade under two regimes. REMIT avoids it where an EMIR or MiFIR report already carries the trade.","u":"remit","a":["double reporting"]},{"k":"eba","t":"EBA","x":"European Banking Authority","d":"One of the three ESAs. Works with ESMA and EIOPA on DORA.","u":"framework","cs":1},{"k":"eic","t":"EIC","x":"Energy Identification Code","d":"Identifies energy objects such as generating units, areas, interconnectors and market participants.","u":"transparency","cs":1},{"k":"eiopa","t":"EIOPA","x":"European Insurance and Occupational Pensions Authority","d":"One of the three ESAs.","u":"framework","cs":1},{"k":"emir","t":"EMIR","x":"European Market Infrastructure Regulation, Regulation 648/2012","d":"Requires both counterparties to report derivatives to a trade repository by the following working day, and to keep the record current for the life of the trade.","u":"emir","cs":1},{"k":"refit","t":"EMIR Refit","d":"The rewrite of EMIR reporting standards, live in the EU since 29 April 2024. 203 fields in ISO 20022 XML.","u":"emir","a":["Refit"]},{"k":"entsoe","t":"ENTSO-E","x":"European Network of Transmission System Operators for Electricity","d":"The association of European electricity TSOs. Runs the Transparency Platform.","u":"transparency","cs":1,"a":["ENTSOs"]},{"k":"tp","t":"Transparency Platform","d":"The ENTSO-E site where EU electricity transparency data is published under Regulation 543/2013.","u":"transparency","a":["ENTSO-E Transparency Platform","ENTSO-E platform","transparency platform"]},{"k":"esas","t":"ESAs","x":"European Supervisory Authorities","d":"EBA, EIOPA and ESMA. Jointly draft DORA standards and oversee critical ICT third-party providers.","u":"framework","cs":1},{"k":"esma","t":"ESMA","x":"European Securities and Markets Authority","d":"Drafts EMIR and MiFIR technical standards, issues guidelines and Q&As, and directly supervises trade repositories and most ARMs.","u":"framework","cs":1},{"k":"etrm","t":"ETRM","x":"Energy Trading and Risk Management system","d":"The trading book: where energy trades are captured, valued and managed. Usually the golden source for trade reporting.","u":"controls","cs":1},{"k":"expo","t":"Exposure reporting","d":"New under the 2026 REMIT recast: reporting of market participants’ trading positions to ACER.","u":"remit","a":["exposure reporting"]},{"k":"fc","t":"FC","x":"Financial counterparty","d":"Under EMIR, banks, investment firms, insurers, funds and similar. Reports valuation and collateral, and reports on behalf of NFC− counterparties for OTC trades.","u":"emir","cs":1,"a":["FCs","financial counterparty","financial counterparties"]},{"k":"nfcp","t":"NFC+","x":"Non-financial counterparty above a clearing threshold","d":"A non-financial firm whose OTC derivative positions exceed an EMIR clearing threshold. Reports valuation and collateral.","u":"emir","cs":1},{"k":"nfcm","t":"NFC−","x":"Non-financial counterparty below the clearing thresholds","d":"A smaller non-financial firm. For OTC trades with an FC, the FC reports on its behalf.","u":"emir","cs":1},{"k":"fe","t":"Financial entity","d":"One of the types of firm DORA covers, such as banks, investment firms and insurers. An energy group is in DORA scope only through these.","u":"dora","a":["financial entity","financial entities"]},{"k":"golden","t":"Golden source","d":"The one system treated as the truth for a piece of data, such as trades in the ETRM.","u":"controls","a":["golden source","golden sources"]},{"k":"iip","t":"IIP","x":"Inside Information Platform","d":"An ACER-authorised platform for publishing inside information. Under revised REMIT, inside information is disclosed through one.","u":"remit","cs":1,"a":["IIPs","inside information platform","inside information platforms"]},{"k":"impl","t":"Implementing act","d":"A Level 2 act adopted by the Commission to set uniform conditions for applying Level 1 law. ITS and the REMIT Implementing Regulation are implementing acts.","u":"framework","a":["implementing act","implementing acts","Implementing Regulation"]},{"k":"insider","t":"Inside information","d":"Precise, non-public information that would likely move wholesale energy prices if made public. Must be disclosed promptly, and not traded on before.","u":"remit","a":["inside information"]},{"k":"invfirm","t":"Investment firm","d":"A firm licensed under MiFID II. Only investment firms carry the MiFIR Article 26 reporting obligation.","u":"mifir","a":["investment firm","investment firms"]},{"k":"ict","t":"ICT","x":"Information and communication technology","d":"Systems, networks, software and data services. DORA is about ICT risk.","u":"dora","cs":1},{"k":"isin","t":"ISIN","x":"International Securities Identification Number","d":"Twelve characters identifying a financial instrument.","u":"mifir","cs":1},{"k":"iso","t":"ISO 20022","d":"The international messaging standard used for EMIR Refit reports, in XML.","u":"emir"},{"k":"its","t":"ITS","x":"Implementing Technical Standards","d":"Level 2 standards on formats and procedures. Drafted by an ESA, adopted by the Commission as implementing acts.","u":"framework","cs":1},{"k":"lei","t":"LEI","x":"Legal Entity Identifier","d":"Twenty characters identifying a legal entity. Used across almost every regime; it has to be renewed every year.","u":"controls","cs":1,"a":["LEIs"]},{"k":"levels","t":"Level 1, 2, 3","d":"Level 1 is the law itself. Level 2 is the detailed rules adopted under it. Level 3 is guidance on how supervisors read both.","u":"framework","a":["Level 1","Level 2","Level 3"]},{"k":"lineage","t":"Lineage","d":"The traceable path from an obligation and a source record to the reported field.","u":"controls","a":["lineage"]},{"k":"major","t":"Major ICT incident","d":"An ICT incident that meets DORA’s classification thresholds and must be reported to the competent authority.","u":"dora","a":["major ICT incident","major ICT incidents","major incident"]},{"k":"mic","t":"MIC","x":"Market Identifier Code","d":"Four characters identifying a trading venue. Off-venue trades use special codes instead.","u":"mifir","cs":1,"a":["venue code"]},{"k":"mifid","t":"MiFID II","x":"Markets in Financial Instruments Directive, Directive 2014/65","d":"The directive that licenses investment firms and defines financial instruments. Transposed into Dutch law through the Wft.","u":"framework","cs":1},{"k":"mifir","t":"MiFIR","x":"Markets in Financial Instruments Regulation, Regulation 600/2014","d":"Article 26 requires investment firms to report transactions in financial instruments to their NCA by close of the following working day.","u":"mifir","cs":1},{"k":"nra","t":"NRA","x":"National regulatory authority","d":"The national energy regulator. Registers REMIT market participants and investigates and penalises breaches. In the Netherlands, ACM.","u":"framework","cs":1,"a":["NRAs","national regulatory authority"]},{"k":"otc","t":"OTC","x":"Over the counter","d":"Traded bilaterally, not on a trading venue.","u":"emir","cs":1},{"k":"omp","t":"Organised marketplace","d":"An exchange, broker platform or similar venue for wholesale energy products. Under revised REMIT it reports order-book data.","u":"remit","a":["organised marketplace","organised marketplaces","OMP"]},{"k":"pair","t":"Pairing and matching","d":"The trade repository’s check that both sides reported the same trade, with the same details.","u":"emir","a":["pairing and matching","paired"]},{"k":"pop","t":"Population check","d":"Compares what should have been reported with what was. Catches the trade that never left the building.","u":"controls","a":["population check","population checks","Population"]},{"k":"primary","t":"Primary owner","d":"The company that creates or holds transparency data, such as a generator. Passes it to the TSO.","u":"transparency","a":["primary owner","primary owners"]},{"k":"qa","t":"Q&A","d":"Questions and answers published by ESMA or ACER on how they read the rules. Level 3: not law, but supervisors expect you to follow them.","u":"framework","cs":1,"a":["Q&As"]},{"k":"reg","t":"Regulation (EU)","d":"An EU law that applies directly in every member state, with the same text everywhere. REMIT, EMIR, MiFIR and DORA are regulations.","u":"framework"},{"k":"roi","t":"Register of information","d":"DORA’s standing record of a financial entity’s ICT third-party arrangements, submitted to supervisors.","u":"dora","a":["register of information"]},{"k":"remit","t":"REMIT","x":"Regulation on Wholesale Energy Market Integrity and Transparency, Regulation 1227/2011","d":"Prohibits insider dealing and manipulation in EU wholesale gas and power, and requires trade, order, inside information and fundamental data reporting. Revised by Regulation 2024/1106.","u":"remit","cs":1},{"k":"rrm","t":"RRM","x":"Registered Reporting Mechanism","d":"An entity authorised by ACER to report REMIT data for itself or as a service for others.","u":"remit","cs":1,"a":["RRMs"]},{"k":"rts","t":"RTS","x":"Regulatory Technical Standards","d":"Level 2 standards on content, drafted by an ESA and adopted by the Commission as delegated acts. RTS 22 sets the MiFIR report fields.","u":"framework","cs":1,"a":["RTS 22"]},{"k":"t1","t":"T+1","d":"The trade date plus one working day. The usual deadline for EMIR and MiFIR reports.","u":"emir"},{"k":"tr","t":"Trade repository","d":"A company registered with and supervised by ESMA that receives and holds EMIR derivative reports.","u":"emir","a":["trade repository","trade repositories","TR","TRs"]},{"k":"tso","t":"TSO","x":"Transmission system operator","d":"Runs the high-voltage grid. Collects transparency data in its area and sends it to the ENTSO-E platform. In the Netherlands, TenneT.","u":"transparency","cs":1,"a":["TSOs"]},{"k":"tennet","t":"TenneT","d":"The Dutch electricity TSO.","u":"transparency","cs":1},{"k":"unavail","t":"Unavailability","d":"A planned or forced reduction in what a generating unit or line can deliver. Published under the transparency rules and often inside information under REMIT.","u":"transparency","a":["unavailability"]},{"k":"upi","t":"UPI","x":"Unique Product Identifier","d":"Identifies the type of OTC derivative product in EMIR reports. Added by Refit.","u":"emir","cs":1},{"k":"uti","t":"UTI","x":"Unique Transaction Identifier","d":"Shared by both sides of a trade so their EMIR reports can be paired. If the two sides generate different UTIs, the reports never pair.","u":"emir","cs":1,"a":["UTIs"]},{"k":"wft","t":"Wft","x":"Wet op het financieel toezicht","d":"The Dutch Financial Supervision Act. Transposes MiFID II, among much else.","u":"framework","cs":1},{"k":"std","t":"Standard contract","d":"Under REMIT, a contract admitted to trading on an organised marketplace. It stays standard even when traded bilaterally. Reported on Table 1.","a":["standard contract","standard contracts","Standard contracts"]},{"k":"nonstd","t":"Non-standard contract","d":"Under REMIT, any contract not admitted to trading on an organised marketplace, such as a bespoke supply or tolling deal. Reported on Table 2.","a":["non-standard contract","non-standard contracts"]},{"k":"ceremp","t":"CEREMP","x":"Centralised European Register of Energy Market Participants","d":"The register market participants join through their NRA. Registration produces the ACER code.","cs":1},{"k":"stor","t":"STOR","x":"Suspicious transaction and order report","d":"A report to the NRA of transactions or orders that may breach REMIT, made without delay by those who professionally arrange or execute transactions.","cs":1,"a":["STORs"]},{"k":"ppaet","t":"PPAET","x":"Person professionally arranging or executing transactions","d":"A marketplace, broker or similar firm. Must run surveillance and file STORs under REMIT.","cs":1,"a":["PPAETs"]},{"k":"layer","t":"Layering","d":"Placing orders you intend to cancel to create a false picture of supply or demand, while trading on the other side. Also called spoofing.","a":["layering","spoofing"]},{"k":"wash","t":"Wash trade","d":"A trade between accounts under the same control, with no real change of ownership. It creates false volume.","a":["wash trade","wash trades","wash trading"]},{"k":"manip","t":"Market manipulation","d":"Trading or orders that give false signals about supply, demand or price, or secure a price at an artificial level. Banned under REMIT.","a":["market manipulation","manipulation"]},{"k":"capw","t":"Capacity withholding","d":"Offering less capacity to the market than is physically available, to push prices up.","a":["capacity withholding"]},{"k":"mand","t":"Mandatory delegation","d":"Under EMIR, a financial counterparty trading OTC with an NFC− reports both sides and carries the legal responsibility.","a":["mandatory delegation"]},{"k":"clthr","t":"Clearing threshold","d":"The EMIR threshold that decides whether a non-financial counterparty is NFC+ or NFC−.","a":["clearing threshold","clearing thresholds"]},{"k":"valu","t":"VALU","d":"EMIR action type for a valuation update: the daily mark-to-market, without changing the terms.","cs":1},{"k":"maru","t":"MARU","d":"EMIR action type for a margin update: collateral data, usually at portfolio level.","cs":1},{"k":"revi","t":"REVI","d":"EMIR action type that revives a trade cancelled or terminated by mistake.","cs":1},{"k":"mtm","t":"Mark-to-market","d":"Valuing a position at today’s market or forward price, rather than the price it was traded at.","a":["mark-to-market","marked to market","marks it to the forward curve","marked to the curve"]},{"k":"unreal","t":"Unrealised P&L","d":"Profit or loss on a position that hasn’t been delivered and settled yet. It moves with the forward curve.","a":["unrealised","unrealised P&L"]},{"k":"real","t":"Realised P&L","d":"Profit or loss that has been locked in by delivery and settlement.","a":["realised","realised P&L"]},{"k":"pnlx","t":"P&L explain","d":"A breakdown of the daily change in value into causes: curve moves, new trades, amendments. Whatever is left is unexplained P&L, which is a break.","a":["P&L explain","unexplained P&L"]},{"k":"conf","t":"Confirmation","d":"The document both counterparties exchange to confirm a trade’s terms. Matching confirmations is the first check on a booking.","a":["confirmation","confirmations","confirmation matching"]},{"k":"settle","t":"Settlement","d":"Turning delivered trades into cash: settlement statements, invoices, payment, and posting to the ledger.","a":["settlement","settles","settled"]},{"k":"imb","t":"Imbalance settlement","d":"The settlement of the difference between what a balance responsible party scheduled and what was actually delivered or consumed, at the imbalance price.","a":["imbalance settlement","imbalance price","imbalance charges"]},{"k":"gl","t":"General ledger","d":"The firm’s accounting record. The back office reconciles settled cash into it.","a":["general ledger","ledger"]},{"k":"fmb","t":"Front, middle and back office","d":"Front office trades and captures deals; middle office produces P&L, positions and risk; back office confirms, settles and accounts.","a":["front office","middle office","back office"]},{"k":"algo","t":"Algorithmic trading","d":"Trading where a computer algorithm decides order parameters with little or no human intervention. Under REMIT Article 5a since May 2024: controls required, and a notification to the NRA and ACER.","a":["algorithmic trading","algorithm","algorithms"]},{"k":"dea","t":"DEA","x":"Direct electronic access","d":"Letting another firm send orders straight to a marketplace using your trading code or infrastructure. Covered by REMIT Article 5a alongside algorithmic trading.","cs":1,"a":["direct electronic access"]},{"k":"kill","t":"Kill switch","d":"A control that stops an algorithm and cancels its orders at once. Essential, but it depends on someone using it.","a":["kill switch"]},{"k":"plim","t":"Position limit","d":"A pre-trade control that stops trading once a position reaches a set size, automatically.","a":["position limit","position limits"]},{"k":"collar","t":"Price collar","d":"A pre-trade control that blocks orders priced too far from a reference price.","a":["price collar","price collars"]},{"k":"da","t":"Day-ahead auction","d":"The single EU auction (SDAC) that sets hourly or quarter-hourly prices for the next day, closing at noon CET the day before delivery.","a":["day-ahead auction","day-ahead"]},{"k":"sdac","t":"SDAC","x":"Single day-ahead coupling","d":"The coupled EU day-ahead auction.","cs":1},{"k":"intra","t":"Intraday market","d":"Trading after the day-ahead auction, continuously and in intraday auctions, until shortly before delivery.","a":["intraday","intraday market","continuous intraday"]},{"k":"gate","t":"Gate closure","d":"The moment a market stops accepting orders for a delivery period.","a":["gate closure"]},{"k":"bcap","t":"Balancing capacity","d":"Reserve capacity a TSO buys in advance, paid for being available. FCR, aFRR and mFRR are the main products.","a":["balancing capacity"]},{"k":"bnrg","t":"Balancing energy","d":"Energy a TSO activates in real time from reserve bids to keep the system in balance.","a":["balancing energy"]},{"k":"fcr","t":"FCR, aFRR, mFRR","x":"Frequency containment reserve; automatic and manual frequency restoration reserve","d":"The main reserve products, from the fastest-acting (FCR) to the slowest (mFRR).","cs":1,"a":["FCR","aFRR","mFRR"]},{"k":"anc","t":"Ancillary markets","d":"The markets where TSOs buy reserves and other services that keep the grid stable, as opposed to the energy itself.","a":["ancillary markets","ancillary services"]},{"k":"nom","t":"Nomination","d":"Telling the TSO or system operator how much energy you will deliver or take, and where.","a":["nomination","nominations","nominated"]},{"k":"periodic","t":"Periodic reporting","d":"The 2026 REMIT recast category for data reported in batches, monthly or annually, rather than trade by trade. Includes balancing services and hydrogen.","a":["periodic reporting"]},{"k":"reportonce","t":"Report once","d":"ESMA’s proposed long-term framework in which a transaction is reported once and shared across MiFIR, EMIR and SFTR.","a":["report once"]}];
+  var GK={};G.forEach(function(e){GK[e.k]=e});
+  var AL=[];G.forEach(function(e){if(e.nolink)return;[e.t].concat(e.a||[]).forEach(function(s){AL.push({s:s,k:e.k,cs:!!e.cs||((s.match(/[A-Z]/g)||[]).length>=2)})})});
+  AL.sort(function(a,b){return b.s.length-a.s.length});
+  function rxe(s){return s.replace(/[.*+?^$(){}|[\]\\]/g,'\\$&')}
+  var GRE=new RegExp('(?<![A-Za-z0-9])('+AL.map(function(a){return rxe(a.s)}).join('|')+')(?![A-Za-z0-9])','gi');
+  function glookup(m){var lm=m.toLowerCase();for(var i=0;i<AL.length;i++){var a=AL[i];if(a.s.toLowerCase()===lm&&(!a.cs||a.s===m))return a.k}return null}
+  var GSKIP='svg,a,button,h1,input,textarea,.eyebrow,.snum,.bar,.cover,.readout,.verdict,.choices,.controls,.list,.stepmeta,.log,.model,script,style';
+  var GBLK='p,td,th,li,dd,h2,h3';
+  function linkify(root,ex){if(!root)return;var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),nodes=[],n;
+    while((n=tw.nextNode())){if(!n.nodeValue.trim())continue;var p=n.parentElement;if(!p||p.closest(GSKIP))continue;nodes.push(n)}
+    var seen=new Map();
+    nodes.forEach(function(t){var blk=t.parentElement.closest(GBLK)||root,set=seen.get(blk);if(!set){set=new Set();seen.set(blk,set)}
+      var v=t.nodeValue,last=0,frag=null,m;GRE.lastIndex=0;
+      while((m=GRE.exec(v))){var k=glookup(m[0]);if(!k||k===ex||set.has(k))continue;set.add(k);
+        frag=frag||document.createDocumentFragment();frag.appendChild(document.createTextNode(v.slice(last,m.index)));
+        var a=document.createElement('a');a.className='gt';a.href='#';a.setAttribute('data-g',k);a.setAttribute('aria-haspopup','dialog');a.textContent=m[0];frag.appendChild(a);last=m.index+m[0].length}
+      if(frag){frag.appendChild(document.createTextNode(v.slice(last)));t.parentNode.replaceChild(frag,t)}});}
+  var dlg=document.createElement('dialog');dlg.className='gd';dlg.setAttribute('aria-label','Glossary');
+  dlg.innerHTML='<div class="in"><div class="top"><span class="ey">Glossary</span><button class="x" aria-label="Close glossary">\u2715</button></div><div class="body"></div></div>';
+  document.body.appendChild(dlg);var gb=dlg.querySelector('.body');
+  dlg.querySelector('.x').addEventListener('click',function(){dlg.close()});
+  dlg.addEventListener('click',function(e){if(e.target===dlg)dlg.close()});
+  dlg.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();dlg.close()}});
+  function show(){if(!dlg.open)dlg.showModal();dlg.querySelector('.in').scrollTop=0}
+  function openTerm(k){var e=GK[k];if(!e)return;
+    gb.innerHTML='<h3>'+e.t+'</h3>'+(e.x?'<p class="exp">'+e.x+'</p>':'')+'<p class="def">'+e.d+'</p>'+
+'<button class="all">All terms</button>';
+    linkify(gb.querySelector('.def'),k);gb.querySelector('.all').addEventListener('click',openAll);show();}
+  function openAll(){var list=G.slice().sort(function(a,b){return a.t.toLowerCase()<b.t.toLowerCase()?-1:1});
+    gb.innerHTML='<h3>All terms</h3><input type="search" placeholder="Filter terms" aria-label="Filter terms"><dl></dl>';
+    var dl=gb.querySelector('dl'),inp=gb.querySelector('input');
+    function draw(q){q=(q||'').toLowerCase();dl.innerHTML=list.filter(function(e){return !q||(e.t+' '+(e.x||'')+' '+e.d).toLowerCase().indexOf(q)>=0}).map(function(e){return '<dt><a href="#" data-g="'+e.k+'">'+e.t+'</a></dt><dd>'+(e.x?e.x+'. ':'')+e.d+'</dd>'}).join('')||'<dd>No term matches that. Try an abbreviation.</dd>'}
+    inp.addEventListener('input',function(){draw(inp.value)});draw('');show();if(matchMedia('(hover:hover)').matches)inp.focus();}
+  document.addEventListener('click',function(e){var g=e.target.closest('[data-g]');if(g){e.preventDefault();openTerm(g.getAttribute('data-g'));return}
+    if(e.target.closest('[data-gall]')){e.preventDefault();openAll()}});
+  linkify(document.querySelector('main'));
+
+})();
+</script>
+</body>
+</html>
